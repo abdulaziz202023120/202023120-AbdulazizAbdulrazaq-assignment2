@@ -6,7 +6,7 @@ plain **HTML, CSS and JavaScript**. Assignment 2 starts from my
 and makes it interactive: live data from the GitHub API, search / filter / sort, expandable project
 details, a contact form that keeps your draft, and smooth animations.
 
-**Live site:** https://abdulaziz202023120.github.io/202023120-AbdulazizAbdulrazaq-assignment2/
+**Live site:** https://web-engineering-kfupm.github.io/202023120-AbdulazizAbdulrazaq-assignment2/
 
 ---
 
@@ -15,7 +15,7 @@ details, a contact form that keeps your draft, and smooth animations.
 | Requirement | What I built |
 |-------------|--------------|
 | **Dynamic content** | *Code on GitHub* section: live search while typing, filter by language and sort by date, name or stars. Project cards have a **Show details / Hide details** button that expands extra information. |
-| **Data handling** | Repositories are **fetched from the public GitHub API**. The result is cached in `localStorage` for 30 minutes (fewer API calls). The contact form **saves your draft** in `localStorage` and restores it on your next visit. The theme choice is still remembered. |
+| **Data handling** | My repositories are **fetched from the public GitHub API** (my own account plus my course repositories in the class organisation, two requests in parallel). The result is cached in `localStorage` for 30 minutes (fewer API calls). The contact form **saves your draft** in `localStorage` and restores it on your next visit. The theme choice is still remembered. |
 | **Animation & transitions** | Sections fade in as you scroll, cards lift on hover, nav links get an animated underline, project details slide open, loading cards shimmer, form messages fade in and invalid fields shake. All motion turns off for users who choose *reduce motion*. |
 | **Error handling & feedback** | "Loading repositories…" with a spinner and placeholder cards, a friendly error with a **Try again** button (separate message when GitHub's rate limit is hit), an empty-state message when the search finds nothing, a message when the account has no repositories, per-field form errors, a character counter and a success message. |
 
@@ -27,7 +27,7 @@ with active-section highlight, hamburger menu on phones, and a fully responsive 
 - HTML5 (semantic sections, ARIA attributes for the interactive parts)
 - CSS3 (custom properties, Grid, Flexbox, transitions, keyframe animations, media queries); no framework
 - Vanilla JavaScript (ES2020: `fetch`, `async/await`, `IntersectionObserver`, `localStorage`); no libraries
-- GitHub REST API (`GET /users/{user}/repos`, no token needed)
+- GitHub REST API (`GET /users/{user}/repos` and `GET /search/repositories`, no token needed)
 - Hosted with GitHub Pages
 
 ## Project structure
@@ -53,7 +53,7 @@ No build step and no dependencies.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/abdulaziz202023120/202023120-AbdulazizAbdulrazaq-assignment2.git
+   git clone https://github.com/Web-Engineering-KFUPM/202023120-AbdulazizAbdulrazaq-assignment2.git
    cd 202023120-AbdulazizAbdulrazaq-assignment2
    ```
 2. Start a small local server (recommended, because the page calls the GitHub API with `fetch`):
@@ -75,8 +75,8 @@ No build step and no dependencies.
 
 ## Testing
 
-I tested the site in Chromium at 1366 px, 820 px and 390 px, including the error cases (GitHub
-offline, rate limit, no results). There is no horizontal scrolling and no console error in the normal
+The site was tested with automated Playwright checks in Chromium at 1366 px, 820 px and 390 px,
+including the error cases (GitHub offline, rate limit, no results). There is no horizontal scrolling and no console error in the normal
 case. The full test table is in [`docs/technical-documentation.md`](docs/technical-documentation.md#7-testing-performed).
 
 ## AI use (summary)
@@ -84,8 +84,8 @@ case. The full test table is in [`docs/technical-documentation.md`](docs/technic
 I used **Claude (Anthropic)** in the Claude desktop app for this assignment. It read the assignment
 guidelines and rubric with me, proposed and wrote the code changes on top of my Assignment 1 code,
 ran automated browser tests (including simulated API failures), and drafted the documentation.
-I chose which features fit my portfolio, kept the content to my real projects, and reviewed and
-tested the result before submitting. Every AI-assisted commit is marked with `Assisted-by`.
+I set the direction, kept the content to my real projects, and reviewed every file and screenshots
+of the site before it was uploaded. Every AI-assisted commit is marked with `Assisted-by`.
 The full log and my declaration are in [`docs/ai-usage-report.md`](docs/ai-usage-report.md).
 
 ## Author
