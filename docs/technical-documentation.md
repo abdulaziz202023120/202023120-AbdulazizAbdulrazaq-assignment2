@@ -9,7 +9,8 @@ REST API) and several interactive features on top of the Assignment 1 page.
 ```
 Browser ──loads──> index.html ──> css/styles.css
                         │
-                        └──> js/script.js ──fetch──> https://api.github.com/users/abdulaziz202023120/repos
+                        └──> js/script.js ──fetch──> api.github.com: /users/abdulaziz202023120/repos
+                                   │                    + /search/repositories (my course repos)
                                    │
                                    └──> localStorage: theme, repoCache, contactDraft
 ```
@@ -88,15 +89,19 @@ still works for the current visit.
 1. Check `localStorage["repoCache"]`. If it is younger than **30 minutes**, use it and skip the request.
    The GitHub API allows 60 unauthenticated requests per hour per IP, so the cache keeps the page
    working for visitors who reload often.
-2. Otherwise show *"Loading repositories…"* with a spinner and three placeholder cards, then call
-   `GET https://api.github.com/users/abdulaziz202023120/repos?per_page=100&sort=updated`.
+2. Otherwise show *"Loading repositories…"* with a spinner and three placeholder cards, then make two
+   requests in parallel with `Promise.all`:
+   - `GET /users/abdulaziz202023120/repos` for the repositories on my own account, and
+   - `GET /search/repositories?q=202023120 in:name org:Web-Engineering-KFUPM` for my course
+     repositories, which live in the class organisation and start with my student ID.
+   Both lists are merged by `full_name`, so a repository never appears twice.
 3. Forks are removed and each repository is reduced to the six fields the page needs
    (`name`, `description`, `language`, `stars`, `updated`, `url`). That smaller object is what gets cached.
 4. On failure:
 
 | Situation | What the user sees |
 |-----------|--------------------|
-| HTTP 403 (rate limit) | "GitHub is limiting requests right now. Please wait a few minutes, then try again." + **Try again** |
+| HTTP 403 / 429 (rate limit) | "GitHub is limiting requests right now. Please wait a few minutes, then try again." + **Try again** |
 | Network error or other HTTP error | "The repositories could not be loaded. Check your connection, then try again." + **Try again** |
 | Request fails but an older cached copy exists | The cached list, with "GitHub could not be reached, so this is the last saved list." |
 | Account has no public repositories | "There are no public repositories on this account yet. Check back soon." |
