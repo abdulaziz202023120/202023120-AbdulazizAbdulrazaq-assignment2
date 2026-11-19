@@ -13,6 +13,7 @@
    ========================================================================== */
 
 const GITHUB_USER = "abdulaziz202023120";
+const COURSE_QUERY = "202023120 in:name org:Web-Engineering-KFUPM";
 const REPO_CACHE_KEY = "repoCache";
 const REPO_CACHE_MINUTES = 30; // the GitHub API allows 60 requests per hour without a token
 const DRAFT_KEY = "contactDraft";
@@ -241,16 +242,17 @@ function initRepos() {
     list.replaceChildren(...Array.from({ length: 3 }, createSkeletonCard));
 
     try {
-      const response = await fetch(
-        `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=updated`,
-        { headers: { Accept: "application/vnd.github+json" } }
-      );
-      if (response.status === 403) throw new Error("rate-limit");
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      // My own repositories, plus my course repositories in the class organisation
+      // (their names start with my student ID)
+      const [own, course] = await Promise.all([
+        fetchJson(`https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=updated`),
+        fetchJson(`https://api.github.com/search/repositories?per_page=100&q=${encodeURIComponent(COURSE_QUERY)}`),
+      ]);
 
-      const data = await response.json();
+      // Merge both lists without duplicates
+      const byName = new Map([...own, ...course.items].map((repo) => [repo.full_name, repo]));
       // Keep only the fields the page uses, and skip forks
-      repos = data
+      repos = [...byName.values()]
         .filter((repo) => !repo.fork)
         .map((repo) => ({
           name: repo.name,
@@ -296,6 +298,14 @@ function initRepos() {
   language.addEventListener("change", render);
   sort.addEventListener("change", render);
   load();
+}
+
+// GET a GitHub API URL and return the parsed JSON, or throw a clear error
+async function fetchJson(url) {
+  const response = await fetch(url, { headers: { Accept: "application/vnd.github+json" } });
+  if (response.status === 403 || response.status === 429) throw new Error("rate-limit");
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
 }
 
 // Build one repository card with textContent only (API text is never inserted as HTML)
